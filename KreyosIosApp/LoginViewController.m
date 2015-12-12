@@ -91,7 +91,7 @@
     [[BluetoothDelegate instance] setCurrentView:self];
     [[BluetoothDelegate instance] setIsUpdating:NO];
     //*/
-     
+    
     //~~~Debug Hex Data
     //[LoginViewController debugHexData];
 }
@@ -115,25 +115,25 @@
 
 +(id)dataWithHexString:(NSString*)hex
 {
-	char buf[3];
-	buf[2]  = '\0';
-	unsigned char *bytes = (unsigned char*)malloc([hex length]/2);
-	unsigned char *bp = bytes;
-	for (CFIndex i = 0; i < [hex length]; i += 2)
+    char buf[3];
+    buf[2]  = '\0';
+    unsigned char *bytes = (unsigned char*)malloc([hex length]/2);
+    unsigned char *bp = bytes;
+    for (CFIndex i = 0; i < [hex length]; i += 2)
     {
-		buf[0] = [hex characterAtIndex:i];
-		buf[1] = [hex characterAtIndex:i+1];
-		char *b2 = NULL;
-		*bp++ = strtol(buf, &b2, 16);
-	}
-	
-	return [NSData dataWithBytesNoCopy:bytes length:[hex length]/2 freeWhenDone:YES];
+        buf[0] = [hex characterAtIndex:i];
+        buf[1] = [hex characterAtIndex:i+1];
+        char *b2 = NULL;
+        *bp++ = strtol(buf, &b2, 16);
+    }
+    
+    return [NSData dataWithBytesNoCopy:bytes length:[hex length]/2 freeWhenDone:YES];
 }
 
 - (void) viewDidAppear:(BOOL)animated
 {
     
-    [super hideNavigationItem:self]; 
+    [super hideNavigationItem:self];
     
     deleg =  (AppDelegate* )[[UIApplication sharedApplication] delegate];
     
@@ -180,6 +180,8 @@
     
     ADD_TO_ROOT_VIEW(loginview);
     
+    self.tryLoginNoAuth;
+    
 }
 
 - (void) establishLoginUser
@@ -199,10 +201,12 @@
     NSError * err;
     NSData * jsonData = [NSJSONSerialization dataWithJSONObject:userDictionary options:0 error:&err];
     NSString * dataString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    [
+     self performSegueWithIdentifier:SEGUE_LOGIN_TO_FIRSTTIME sender:self.loginButton];
     
-    [self showProgress:YES];
-    [[RequestManager rm] sendRequestPostMethod:kServerSessionKeyURL withPostData:dataString target:self selector:@selector(tryLoginBySessionKey:)];
-
+    //   [self showProgress:YES];
+    // [[RequestManager rm] sendRequestPostMethod:kServerSessionKeyURL withPostData:dataString target:self selector:@selector(tryLoginBySessionKey:)];
+    
 }
 
 #pragma mark FACEBOOK LOGIN
@@ -301,7 +305,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [[DBManager getSharedInstance] initDB];
     
     [self moveUserAfterLogin];
-
+    
     [KreyosDataManager sharedInstance].IsConnectedUsingFB = YES;
     [AccountManager getSharedAccountManager].userID = 1;
 }
@@ -324,7 +328,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
         // Close the session and remove the access token from the cache
         // The session state handler (in the app delegate) will be called automatically
         [FBSession.activeSession closeAndClearTokenInformation];
-
+        
         [self performSegueWithIdentifier:SEGUE_LOADING_TO_MAINSCREEN sender:self];
         
         [[KreyosFacebookController sharedInstance] releaseData];
@@ -407,65 +411,125 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     [self showProgress:NO];
 }
 
+
 -(IBAction)tryLogin:(id)sender
 {
-#ifdef BYPASS_LOGIN
+    //#ifdef BYPASS_LOGIN
     [self didLoginUser:nil];
-    [self performSegueWithIdentifier:SEGUE_LOGIN_TO_FIRSTTIME sender:sender];
+    [self performSegueWithIdentifier:SEGUE_LOGIN_TO_FIRSTTIME sender:self.loginButton];
     return;
-#endif
-    //Check for Internet Connection
-    if( ![deleg isConnectedToWifi] ) return;
-    
-#ifndef DEBUG_BYPASS_LOGIN
-    NSLog(@"this is the login Button! %@",self.userName.text);
-    if(self.userName.text.length != 0 && self.password.text.length != 0)
-    {
-        m_currentSender = sender;
-        
-        if ( ! [[KreyosDataManager sharedInstance] isConnectedToWifi]) return;
-        
-        //Show indicator
-        [self showProgress:YES];
-        
-        //UNCOMMENT WHEN USING WEB DB -Kreyos
-        
-        NSMutableDictionary *userDictionary = [[NSMutableDictionary alloc] init];
-        [userDictionary setObject:self.userName.text forKey:@"email"];
-        [userDictionary setObject:self.password.text forKey:@"password"];
-        
-        NSError * err;
-        NSData * jsonData = [NSJSONSerialization dataWithJSONObject:userDictionary options:0 error:&err];
-        NSString * dataString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        
-        [[RequestManager rm] sendRequestPostMethod:kServerUserLoginURL withPostData:dataString target:self selector:@selector(didLoginUser:)];
-        
-    }
-    else
-    {
-        
-        NSLog(@"User Name or Password Incomplete!");
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"User Authentication Error"
-                                                          message:@"Username or password field are missing!"
-                                                         delegate:nil
-                                                cancelButtonTitle:@"OK"
-                                                otherButtonTitles:nil];
-        //self.userName.text = nil;
-        self.password.text = nil;
-        
-        [message show];
-        
-        
-    }
-#else
-    [self performSegueWithIdentifier:SEGUE_LOGIN_TO_FIRSTTIME sender:sender];
-#endif
+    //#endif
+}
+
+-(void) tryLoginNoAuth
+{
+    [self didLoginUser:nil];
+    [self performSegueWithIdentifier:SEGUE_LOGIN_TO_FIRSTTIME sender:self.loginButton];
 }
 
 #pragma mark LOGIN CALLBACKS
+/*
+ -(void)didLoginUser:(NSData*)pResponseData
+ {
+ #ifdef BYPASS_LOGIN
+ [AccountManager getSharedAccountManager].userID = 1;
+ static NSString* user = @"Kreyos_test";
+ static NSString* email = @"Kreyos_test@gmail.com";
+ static NSString* auth = @"123123qweasd123qwesd123qwe123";
+ 
+ //SAVE AUTHENTICATION KEY
+ [KreyosDataManager setUserDefaultOath:auth];
+ [KreyosDataManager setUserDefaultEmail:email];
+ 
+ //SAVE CURRENT PROFILE
+ Profile* profile        = [[Profile alloc] init];
+ [profile clear];
+ profile.email           = email;
+ profile.kreyosToken     = auth;
+ profile.firstName       = @"Kreyos";
+ profile.lastName        = @"meteor";
+ profile.gender          = @"male";
+ profile.fbToken         = @"";
+ profile.birthday        = @"";
+ profile.weight          = @"";
+ profile.height          = @"";
+ [profile saveData];
+ 
+ // Initialize db
+ [[DBManager getSharedInstance] initDB];
+ 
+ //Set connected to app
+ [KreyosDataManager sharedInstance].IsMainBluetoothSearchShown = YES;
+ 
+ //Hide indicator
+ [self showProgress:NO];
+ return;
+ #endif
+ 
+ NSString *dataParsed = [[NSString alloc] initWithData:pResponseData encoding:NSUTF8StringEncoding];
+ NSLog(@"DATA RECEIVED %@", dataParsed);
+ 
+ NSError* error;
+ NSDictionary* json = [NSJSONSerialization JSONObjectWithData:pResponseData
+ options:kNilOptions
+ error:&error];
+ 
+ int requestCallback = [[json objectForKey:@"status"] intValue];
+ //int userID = [[[json objectForKey:@"user"]  objectForKey:@"id"] intValue];
+ [AccountManager getSharedAccountManager].userID = 1;
+ 
+ if(requestCallback == kLoginSuccess)
+ {
+ [self moveUserAfterLogin];
+ 
+ //SAVE AUTHENTICATION KEY
+ [KreyosDataManager setUserDefaultOath:[[json objectForKey:@"user"] objectForKey:@"auth_token"] ];
+ [KreyosDataManager setUserDefaultEmail:[[json objectForKey:@"user"] objectForKey:@"email"] ];
+ 
+ //SAVE CURRENT PROFILE
+ NSDictionary* userData  = [json objectForKey:@"user"];
+ Profile* profile        = [[Profile alloc] init];
+ [profile clear];
+ profile.email           = [userData objectForKey:@"email"];
+ profile.kreyosToken     = [userData objectForKey:@"auth_token"];
+ profile.firstName       = [userData objectForKey:@"first_name"];
+ profile.lastName        = [userData objectForKey:@"last_name"];
+ profile.gender          = [userData objectForKey:@"gender"];
+ profile.fbToken         = @"";
+ profile.birthday        = @"";
+ profile.weight          = @"";
+ profile.height          = @"";
+ [profile saveData];
+ 
+ // Initialize db
+ [[DBManager getSharedInstance] initDB];
+ 
+ //Set connected to app
+ [KreyosDataManager sharedInstance].IsMainBluetoothSearchShown = YES;
+ }
+ else
+ {
+ 
+ NSLog(@"Authentication Not Completed!");
+ UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"User Authentication Error"
+ message:[json objectForKey:@"message"]
+ delegate:nil
+ cancelButtonTitle:@"OK"
+ otherButtonTitles:nil];
+ //self.userName.text = nil;
+ self.password.text = nil;
+ 
+ [message show];
+ }
+ 
+ //Hide indicator
+ [self showProgress:NO];
+ }
+ */
+
 -(void)didLoginUser:(NSData*)pResponseData
 {
-#ifdef BYPASS_LOGIN
+    //#ifdef BYPASS_LOGIN
     [AccountManager getSharedAccountManager].userID = 1;
     static NSString* user = @"Kreyos_test";
     static NSString* email = @"Kreyos_test@gmail.com";
@@ -498,67 +562,17 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     //Hide indicator
     [self showProgress:NO];
     return;
-#endif
+    //#endif
     
-    NSString *dataParsed = [[NSString alloc] initWithData:pResponseData encoding:NSUTF8StringEncoding];
-    NSLog(@"DATA RECEIVED %@", dataParsed);
-    
-    NSError* error;
-    NSDictionary* json = [NSJSONSerialization JSONObjectWithData:pResponseData
-                                                         options:kNilOptions
-                                                           error:&error];
-    
-    int requestCallback = [[json objectForKey:@"status"] intValue];
-    //int userID = [[[json objectForKey:@"user"]  objectForKey:@"id"] intValue];
-    [AccountManager getSharedAccountManager].userID = 1;
-
-    if(requestCallback == kLoginSuccess)
-    {
-        [self moveUserAfterLogin];
-        
-        //SAVE AUTHENTICATION KEY
-        [KreyosDataManager setUserDefaultOath:[[json objectForKey:@"user"] objectForKey:@"auth_token"] ];
-        [KreyosDataManager setUserDefaultEmail:[[json objectForKey:@"user"] objectForKey:@"email"] ];
-        
-        //SAVE CURRENT PROFILE
-        NSDictionary* userData  = [json objectForKey:@"user"];
-        Profile* profile        = [[Profile alloc] init];
-        [profile clear];
-        profile.email           = [userData objectForKey:@"email"];
-        profile.kreyosToken     = [userData objectForKey:@"auth_token"];
-        profile.firstName       = [userData objectForKey:@"first_name"];
-        profile.lastName        = [userData objectForKey:@"last_name"];
-        profile.gender          = [userData objectForKey:@"gender"];
-        profile.fbToken         = @"";
-        profile.birthday        = @"";
-        profile.weight          = @"";
-        profile.height          = @"";
-        [profile saveData];
-        
-        // Initialize db
-        [[DBManager getSharedInstance] initDB];
-        
-        //Set connected to app
-        [KreyosDataManager sharedInstance].IsMainBluetoothSearchShown = YES;
-    }
-    else
-    {
-        
-        NSLog(@"Authentication Not Completed!");
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"User Authentication Error"
-                                                          message:[json objectForKey:@"message"]
-                                                         delegate:nil
-                                                cancelButtonTitle:@"OK"
-                                                otherButtonTitles:nil];
-        //self.userName.text = nil;
-        self.password.text = nil;
-        
-        [message show];
-    }
-    
-    //Hide indicator
-    [self showProgress:NO];
 }
+
+
+
+
+
+
+
+
 
 #pragma mark TWITTER DELEGATES
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -652,32 +666,32 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     if ( ![[KreyosDataManager sharedInstance] isConnectedToWifi ]) return;
     
     [self performSegueWithIdentifier:SEGUE_LOADING_TO_REGISTERUSER sender:self];
-
+    
     /*
-    BOOL _hasUser = [[DBManager getSharedInstance] getIfUserisLoggedIn];
-   
-    if(!_hasUser)
-    {
-        
+     BOOL _hasUser = [[DBManager getSharedInstance] getIfUserisLoggedIn];
+     
+     if(!_hasUser)
+     {
+     
      KLog(@"Register New User!");
-    [self performSegueWithIdentifier:SEGUE_LOADING_TO_REGISTERUSER sender:sender];
-    }
-    else
-    {
-        KLog(@"User Name or Password Incomplete!");
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Currently Unavailable"
-                                                          message:@"Already Has a User!"
-                                                         delegate:nil
-                                                cancelButtonTitle:@"OK"
-                                                otherButtonTitles:nil];
-        self.userName.text = nil;
-        self.password.text = nil;
-        
-        [message show];
-    }'*/
+     [self performSegueWithIdentifier:SEGUE_LOADING_TO_REGISTERUSER sender:sender];
+     }
+     else
+     {
+     KLog(@"User Name or Password Incomplete!");
+     UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Currently Unavailable"
+     message:@"Already Has a User!"
+     delegate:nil
+     cancelButtonTitle:@"OK"
+     otherButtonTitles:nil];
+     self.userName.text = nil;
+     self.password.text = nil;
+     
+     [message show];
+     }'*/
 }
 
-#pragma mark LOGIN 
+#pragma mark LOGIN
 - (void) moveUserAfterLogin
 {
     BOOL hasLoggedInBefore = (BOOL)[USERDATA objectForKey:@"isUserLogB4"];

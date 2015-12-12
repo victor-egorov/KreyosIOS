@@ -171,7 +171,8 @@
     	peripheral      = (CBPeripheral*)[devices objectAtIndex:row];
 	}
     
-	if ( ![peripheral isConnected] ) //~~~Not Connected
+//	if ( ![peripheral isConnected] ) //~~~Not Connected
+    if ( !(peripheral.state ==  CBPeripheralStateConnected)) //~~~Not Connected
     {
 
         [[LkDiscovery sharedInstance] connectPeripheral:peripheral];

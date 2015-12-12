@@ -1207,7 +1207,8 @@ static BluetoothDelegate* singleInstance = nil;
     LkDiscovery* lkd = [LkDiscovery sharedInstance];
     for (CBPeripheral* peripheral in [lkd previouslyConnectedPeripherals])
     {
-        if (![peripheral isConnected])
+        //if (![peripheral isConnected])
+        if (!(peripheral.state == CBPeripheralStateConnected))
         {
             [lkd connectPeripheral:peripheral];
             
@@ -1226,8 +1227,9 @@ static BluetoothDelegate* singleInstance = nil;
 - (void) kreyosServiceDidChangeStatus:(LKreyosService*)service
 {
     BluetoothDelegate* delegate = [BluetoothDelegate instance];
-    if ( [[service peripheral] isConnected] )
-    {
+//    if ( [[service peripheral] isConnected] )
+        if ( [service peripheral].state == CBPeripheralStateConnected )
+        {
         NSLog(@"Service (%@) connected", service.peripheral.name);
         
         if ( ![delegate.connectedServices containsObject:service] )

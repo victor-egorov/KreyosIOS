@@ -220,6 +220,7 @@
 		840586C818D592820058BB8E /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 840586C718D592820058BB8E /* libz.dylib */; };
 		840586CA18D592870058BB8E /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840586C918D592870058BB8E /* OpenGLES.framework */; };
 		840586CC18D592910058BB8E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840586CB18D592910058BB8E /* SystemConfiguration.framework */; };
+		9487901D1C19C4AB00AED2AC /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9487901C1C19C4AB00AED2AC /* Entitlements.plist */; settings = {ASSET_TAGS = (); }; };
 		D714D2E619482E57006CAAE8 /* TodaysActivityTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D714D2E519482E57006CAAE8 /* TodaysActivityTableViewController.m */; };
 		D733BC88192A02E6007620A3 /* btn_fb_login@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D733BC82192A02E6007620A3 /* btn_fb_login@2x.png */; };
 		D733BC89192A02E6007620A3 /* icon_email@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D733BC83192A02E6007620A3 /* icon_email@2x.png */; };
@@ -724,6 +725,7 @@
 		840586C718D592820058BB8E /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		840586C918D592870058BB8E /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		840586CB18D592910058BB8E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		9487901C1C19C4AB00AED2AC /* Entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Entitlements.plist; sourceTree = "<group>"; };
 		D714D2E419482E57006CAAE8 /* TodaysActivityTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TodaysActivityTableViewController.h; sourceTree = "<group>"; };
 		D714D2E519482E57006CAAE8 /* TodaysActivityTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TodaysActivityTableViewController.m; sourceTree = "<group>"; };
 		D733BC82192A02E6007620A3 /* btn_fb_login@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "btn_fb_login@2x.png"; sourceTree = "<group>"; };
@@ -1296,6 +1298,7 @@
 		35B1338718C7FFE000CE0CBE = {
 			isa = PBXGroup;
 			children = (
+				9487901C1C19C4AB00AED2AC /* Entitlements.plist */,
 				D747894318D5CB4900B6346B /* GoogleMaps.bundle */,
 				353DDDEB18C9665900141480 /* Main */,
 				35B1339918C7FFE000CE0CBE /* KreyosIosApp */,
@@ -1958,6 +1961,7 @@
 				359BD3AE18E657370000A7C7 /* createidbar.png in Resources */,
 				352FEF7818D1AC900098827F /* AppIcon40x40.png in Resources */,
 				359BD3CA18E657370000A7C7 /* caloriesiconblack.png in Resources */,
+				9487901D1C19C4AB00AED2AC /* Entitlements.plist in Resources */,
 				352FEF7D18D1AC900098827F /* AppIcon60x60@2x.png in Resources */,
 				D77509C019061A9B00B41DDB /* sports_mode_bg.png in Resources */,
 				355165CC18EE87BF0053B982 /* kreyos_update.png in Resources */,
@@ -2275,9 +2279,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Kreyos, Inc. (HGW65U9A6N)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Kreyos, Inc. (HGW65U9A6N)";
+				"CODE_SIGN_ENTITLEMENTS[sdk=*]" = Entitlements.plist;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "-";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/FacebookSDK",
@@ -2288,7 +2294,7 @@
 				GCC_PREFIX_HEADER = "KreyosIosApp/KreyosIosApp-Prefix.pch";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "KreyosIosApp/KreyosIosApp-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -2296,7 +2302,8 @@
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Kreyos;
-				PROVISIONING_PROFILE = "83fe79bd-cfab-4dbe-abfa-f5913a9f25f4";
+				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos9.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -2307,9 +2314,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Kreyos, Inc. (HGW65U9A6N)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Kreyos, Inc. (HGW65U9A6N)";
+				"CODE_SIGN_ENTITLEMENTS[sdk=*]" = Entitlements.plist;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "-";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/FacebookSDK",
@@ -2320,7 +2329,7 @@
 				GCC_PREFIX_HEADER = "KreyosIosApp/KreyosIosApp-Prefix.pch";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "KreyosIosApp/KreyosIosApp-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -2328,7 +2337,8 @@
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Kreyos;
-				PROVISIONING_PROFILE = "83fe79bd-cfab-4dbe-abfa-f5913a9f25f4";
+				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos9.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

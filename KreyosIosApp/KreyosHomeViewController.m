@@ -727,7 +727,8 @@ static NSTimer* m_fetchHomeData;
     else
         [[cell textLabel] setText:@"Peripheral"];
     
-    [[cell detailTextLabel] setText:[peripheral isConnected] ? @"Connected" : @"Not connected"];
+//    [[cell detailTextLabel] setText:[peripheral isConnected] ? @"Connected" : @"Not connected"];
+    [[cell detailTextLabel] setText:(peripheral.state == CBPeripheralStateConnected) ? @"Connected" : @"Not connected"];
     
     /* if( [peripheral isConnected] )
      [self SetThisButton:m_disconnectBtn setTruFalse:TRUE];
@@ -772,7 +773,9 @@ static NSTimer* m_fetchHomeData;
     	peripheral  = (CBPeripheral*)[devices objectAtIndex:row];
 	}
     
-	if (![peripheral isConnected])
+//	if (![peripheral isConnected])
+    	if (!(peripheral.state == CBPeripheralStateConnected))
+    
     {
         
 		[[LkDiscovery sharedInstance] connectPeripheral:peripheral];

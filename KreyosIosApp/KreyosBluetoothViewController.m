@@ -242,7 +242,8 @@
     else
         [[cell textLabel] setText:@"Peripheral"];
     
-    [[cell detailTextLabel] setText: [peripheral isConnected] ? @"Connected" : @"Not connected"];
+//    [[cell detailTextLabel] setText: [peripheral isConnected] ? @"Connected" : @"Not connected"];
+    [[cell detailTextLabel] setText: (peripheral.state == CBPeripheralStateConnected) ? @"Connected" : @"Not connected"];
     
 	return cell;
 }
@@ -294,7 +295,9 @@
     	peripheral      = (CBPeripheral*)[devices objectAtIndex:row];
 	}
     
-	if (![peripheral isConnected]) //~~~Not Connected
+//	if (![peripheral isConnected]) //~~~Not Connected
+    	if (!(peripheral.state == CBPeripheralStateConnected)) //~~~Not Connected
+        
     {
         //~~~Check if it has a current device connected in the phone
         //   if true show warning message
